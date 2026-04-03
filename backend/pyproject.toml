@@ -9,6 +9,9 @@ dependencies = [
     "djangorestframework-simplejwt>=5.3",
     "drf-spectacular>=0.28",
     "django-unfold>=0.43.0",
+    "django-cors-headers>=4.0",
+    "qrcode[pil]>=7.4",
+    "django-filter>=24.0",
 ]
 
 [dependency-groups]

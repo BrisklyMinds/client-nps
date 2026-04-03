@@ -5,6 +5,8 @@ from django.db import transaction
 from django.utils.translation import gettext_lazy as _
 from rest_framework import exceptions, serializers
 
+from .models import Feedback, FeedbackFile, FeedbackType, System
+
 User = get_user_model()
 
 
@@ -121,3 +123,140 @@ class UserCreateErrorSerializer(serializers.Serializer):
     password_retype = serializers.ListSerializer(
         child=serializers.CharField(), required=False
     )
+
+
+######################################################################
+# System serializers
+######################################################################
+
+
+class SystemSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = System
+        fields = ["id", "name", "slug", "description", "is_active", "created_at"]
+        read_only_fields = ["id", "created_at"]
+
+
+class SystemListSerializer(serializers.ModelSerializer):
+    feedback_count = serializers.IntegerField(read_only=True)
+    average_rating = serializers.FloatField(read_only=True, allow_null=True)
+
+    class Meta:
+        model = System
+        fields = ["id", "name", "slug", "feedback_count", "average_rating"]
+
+
+class SystemPublicSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = System
+        fields = ["name", "slug"]
+
+
+######################################################################
+# Feedback serializers
+######################################################################
+
+
+class FeedbackFileSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = FeedbackFile
+        fields = ["id", "file", "original_name", "file_size", "content_type"]
+        read_only_fields = ["id"]
+
+
+class FeedbackCreateSerializer(serializers.ModelSerializer):
+    system_slug = serializers.SlugRelatedField(
+        slug_field="slug",
+        queryset=System.objects.filter(is_active=True),
+        source="system",
+    )
+    files = serializers.ListField(
+        child=serializers.FileField(),
+        required=False,
+        write_only=True,
+    )
+
+    class Meta:
+        model = Feedback
+        fields = ["system_slug", "phone", "feedback_type", "rating", "comment", "files"]
+
+    def validate(self, attrs):
+        if attrs.get("feedback_type") == FeedbackType.REVIEW and not attrs.get(
+            "rating"
+        ):
+            raise serializers.ValidationError(
+                {"rating": _("Rating is required for reviews.")}
+            )
+        if attrs.get("feedback_type") != FeedbackType.REVIEW:
+            attrs["rating"] = None
+        return attrs
+
+    def create(self, validated_data):
+        files_data = validated_data.pop("files", [])
+        with transaction.atomic():
+            feedback = Feedback.objects.create(**validated_data)
+            for f in files_data:
+                FeedbackFile.objects.create(
+                    feedback=feedback,
+                    file=f,
+                    original_name=f.name,
+                    file_size=f.size,
+                    content_type=f.content_type or "application/octet-stream",
+                )
+        return feedback
+
+
+class FeedbackCreateErrorSerializer(serializers.Serializer):
+    system_slug = serializers.ListSerializer(
+        child=serializers.CharField(), required=False
+    )
+    phone = serializers.ListSerializer(child=serializers.CharField(), required=False)
+    feedback_type = serializers.ListSerializer(
+        child=serializers.CharField(), required=False
+    )
+    rating = serializers.ListSerializer(child=serializers.CharField(), required=False)
+    comment = serializers.ListSerializer(child=serializers.CharField(), required=False)
+    files = serializers.ListSerializer(child=serializers.CharField(), required=False)
+
+
+class FeedbackDetailSerializer(serializers.ModelSerializer):
+    system = SystemSerializer(read_only=True)
+    files = FeedbackFileSerializer(many=True, read_only=True)
+
+    class Meta:
+        model = Feedback
+        fields = [
+            "id",
+            "system",
+            "phone",
+            "feedback_type",
+            "rating",
+            "comment",
+            "files",
+            "created_at",
+        ]
+
+
+class FeedbackListSerializer(serializers.ModelSerializer):
+    system_name = serializers.CharField(source="system.name", read_only=True)
+    files_count = serializers.IntegerField(source="files.count", read_only=True)
+
+    class Meta:
+        model = Feedback
+        fields = [
+            "id",
+            "system_name",
+            "phone",
+            "feedback_type",
+            "rating",
+            "comment",
+            "files_count",
+            "created_at",
+        ]
+
+
+class FeedbackStatsSerializer(serializers.Serializer):
+    total_count = serializers.IntegerField()
+    average_rating = serializers.FloatField(allow_null=True)
+    by_type = serializers.DictField(child=serializers.IntegerField())
+    by_system = serializers.ListField(child=serializers.DictField())
