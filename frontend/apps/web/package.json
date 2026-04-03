@@ -1,0 +1,28 @@
+{
+  "name": "web",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "lint": "next lint"
+  },
+  "dependencies": {
+    "@frontend/types": "workspace:^",
+    "@frontend/ui": "workspace:^",
+    "@hookform/resolvers": "^3.9.1",
+<<<<<<< HEAD
+    "next": "^16.0.1",
+    "next-auth": "^4.24.11",
+=======
+    "next": "^16.0.10",
+    "next-auth": "^4.24.13",
+>>>>>>> pre-commit-ci-update-config
+    "react-hook-form": "^7.54.2",
+    "zod": "^3.24.1"
+  },
+  "devDependencies": {
+    "typescript": "5.7.2"
+  }
+}
