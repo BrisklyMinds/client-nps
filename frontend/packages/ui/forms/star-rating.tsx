@@ -18,7 +18,9 @@ function StarIcon({
       fill={filled ? 'currentColor' : 'none'}
       stroke="currentColor"
       strokeWidth={1.5}
+      aria-hidden="true"
     >
+      <title>Звезда</title>
       <path
         strokeLinecap="round"
         strokeLinejoin="round"

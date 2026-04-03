@@ -1,3 +1,6 @@
 {
-  "extends": ["frontend/biome.json"]
+  "extends": ["frontend/biome.json"],
+  "files": {
+    "ignore": [".claude", ".next", "packages/types/api"]
+  }
 }

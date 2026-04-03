@@ -37,9 +37,10 @@ export function FileUpload({
   label?: string
 }): React.ReactElement {
   const inputRef = useRef<HTMLInputElement>(null)
+  const previewsRef = useRef<Map<string, string>>(new Map())
   const [isDragging, setIsDragging] = useState(false)
   const [fileErrors, setFileErrors] = useState<string[]>([])
-  const [previews, setPreviews] = useState<Map<string, string>>(new Map())
+  const [, forceUpdate] = useState(0)
 
   const addFiles = useCallback(
     (newFiles: FileList | File[]) => {
@@ -71,37 +72,35 @@ export function FileUpload({
   const removeFile = useCallback(
     (index: number) => {
       const key = `${files[index].name}-${files[index].size}`
-      const newPreviews = new Map(previews)
-      const url = newPreviews.get(key)
+      const url = previewsRef.current.get(key)
       if (url) {
         URL.revokeObjectURL(url)
-        newPreviews.delete(key)
-        setPreviews(newPreviews)
+        previewsRef.current.delete(key)
       }
       onFilesChange(files.filter((_, i) => i !== index))
     },
-    [files, onFilesChange, previews]
+    [files, onFilesChange]
   )
 
   useEffect(() => {
-    const newPreviews = new Map(previews)
+    let changed = false
     for (const file of files) {
       const key = `${file.name}-${file.size}`
-      if (!newPreviews.has(key) && isImage(file)) {
-        newPreviews.set(key, URL.createObjectURL(file))
+      if (!previewsRef.current.has(key) && isImage(file)) {
+        previewsRef.current.set(key, URL.createObjectURL(file))
+        changed = true
       }
     }
-    setPreviews(newPreviews)
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+    if (changed) forceUpdate((n) => n + 1)
   }, [files])
 
   useEffect(() => {
+    const currentPreviews = previewsRef.current
     return () => {
-      for (const url of previews.values()) {
+      for (const url of currentPreviews.values()) {
         URL.revokeObjectURL(url)
       }
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
   useEffect(() => {
@@ -172,7 +171,9 @@ export function FileUpload({
           fill="none"
           stroke="currentColor"
           viewBox="0 0 24 24"
+          aria-hidden="true"
         >
+          <title>Загрузка файлов</title>
           <path
             strokeLinecap="round"
             strokeLinejoin="round"
@@ -207,7 +208,7 @@ export function FileUpload({
         <div className="mt-3 space-y-2">
           {files.map((file, index) => {
             const key = `${file.name}-${file.size}`
-            const previewUrl = previews.get(key)
+            const previewUrl = previewsRef.current.get(key)
 
             return (
               <div
@@ -227,7 +228,9 @@ export function FileUpload({
                       fill="none"
                       stroke="currentColor"
                       viewBox="0 0 24 24"
+                      aria-hidden="true"
                     >
+                      <title>Файл</title>
                       <path
                         strokeLinecap="round"
                         strokeLinejoin="round"
@@ -250,7 +253,14 @@ export function FileUpload({
                   }}
                   aria-label={`Удалить ${file.name}`}
                 >
-                  <svg className="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <svg
+                    className="h-5 w-5"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                    aria-hidden="true"
+                  >
+                    <title>Удалить</title>
                     <path
                       strokeLinecap="round"
                       strokeLinejoin="round"
