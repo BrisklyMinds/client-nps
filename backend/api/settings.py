@@ -16,6 +16,8 @@ DEBUG = environ.get("DEBUG", "") == "1"
 
 ALLOWED_HOSTS = ["localhost", "api"]
 
+FRONTEND_URL = environ.get("FRONTEND_URL", "http://localhost:3000")
+
 WSGI_APPLICATION = "api.wsgi.application"
 
 ROOT_URLCONF = "api.urls"
@@ -33,6 +35,8 @@ INSTALLED_APPS = [
     "django.contrib.sessions",
     "django.contrib.messages",
     "django.contrib.staticfiles",
+    "corsheaders",
+    "django_filters",
     "rest_framework",
     "rest_framework_simplejwt",
     "drf_spectacular",
@@ -44,6 +48,7 @@ INSTALLED_APPS = [
 ######################################################################
 MIDDLEWARE = [
     "django.middleware.security.SecurityMiddleware",
+    "corsheaders.middleware.CorsMiddleware",
     "django.contrib.sessions.middleware.SessionMiddleware",
     "django.middleware.common.CommonMiddleware",
     "django.middleware.csrf.CsrfViewMiddleware",
@@ -125,6 +130,23 @@ USE_TZ = True
 STATIC_URL = "static/"
 
 ######################################################################
+# Media files
+######################################################################
+MEDIA_URL = "media/"
+MEDIA_ROOT = BASE_DIR / "media"
+
+DATA_UPLOAD_MAX_MEMORY_SIZE = 10 * 1024 * 1024  # 10 MB
+FILE_UPLOAD_MAX_MEMORY_SIZE = 5 * 1024 * 1024  # 5 MB
+
+######################################################################
+# CORS
+######################################################################
+CORS_ALLOWED_ORIGINS = [
+    FRONTEND_URL,
+]
+CORS_ALLOW_CREDENTIALS = True
+
+######################################################################
 # Rest Framework
 ######################################################################
 REST_FRAMEWORK = {
@@ -138,21 +160,45 @@ REST_FRAMEWORK = {
         "rest_framework_simplejwt.authentication.JWTAuthentication",
         "rest_framework.authentication.SessionAuthentication",
     ],
+    "DEFAULT_PARSER_CLASSES": [
+        "rest_framework.parsers.JSONParser",
+        "rest_framework.parsers.MultiPartParser",
+        "rest_framework.parsers.FormParser",
+    ],
+    "DEFAULT_FILTER_BACKENDS": [
+        "django_filters.rest_framework.DjangoFilterBackend",
+    ],
 }
 
 ######################################################################
 # Unfold
 ######################################################################
 UNFOLD = {
-    "SITE_HEADER": _("Turbo Admin"),
-    "SITE_TITLE": _("Turbo Admin"),
+    "SITE_HEADER": _("Client NPS Admin"),
+    "SITE_TITLE": _("Client NPS Admin"),
     "SIDEBAR": {
         "show_search": True,
         "show_all_applications": True,
         "navigation": [
             {
-                "title": _("Navigation"),
+                "title": _("Feedback"),
                 "separator": False,
+                "items": [
+                    {
+                        "title": _("Systems"),
+                        "icon": "devices",
+                        "link": reverse_lazy("admin:api_system_changelist"),
+                    },
+                    {
+                        "title": _("Feedbacks"),
+                        "icon": "rate_review",
+                        "link": reverse_lazy("admin:api_feedback_changelist"),
+                    },
+                ],
+            },
+            {
+                "title": _("Users"),
+                "separator": True,
                 "items": [
                     {
                         "title": _("Users"),

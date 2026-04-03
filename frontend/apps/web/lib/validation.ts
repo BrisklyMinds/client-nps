@@ -47,10 +47,37 @@ const changePasswordFormSchema = z
     path: ['passwordRetype']
   })
 
+const feedbackFormSchema = z
+  .object({
+    systemSlug: z.string().min(1),
+    phone: z
+      .string()
+      .min(7, 'Минимум 7 символов')
+      .max(20)
+      .regex(/^\+?[\d\s\-()]+$/, 'Некорректный номер телефона'),
+    feedbackType: z.enum(['bug', 'review', 'suggestion', 'other']),
+    rating: z.number().min(1).max(5).optional().nullable(),
+    comment: z.string().min(10, 'Минимум 10 символов')
+  })
+  .refine(
+    (data) =>
+      data.feedbackType !== 'review' ||
+      (data.rating != null && data.rating >= 1),
+    {
+      message: 'Оценка обязательна для отзывов',
+      path: ['rating']
+    }
+  )
+
+type FeedbackFormSchema = z.infer<typeof feedbackFormSchema>
+
 export {
   changePasswordFormSchema,
   deleteAccountFormSchema,
+  feedbackFormSchema,
   loginFormSchema,
   profileFormSchema,
   registerFormSchema
 }
+
+export type { FeedbackFormSchema }

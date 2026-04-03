@@ -8,16 +8,16 @@ import type {
 } from 'react-hook-form'
 import { twMerge } from 'tailwind-merge'
 
-export function TextField<T extends FieldValues = FieldValues>({
-  type,
+export function TextAreaField<T extends FieldValues = FieldValues>({
   label,
   placeholder,
+  rows = 4,
   register,
   formState
 }: {
-  type: 'text' | 'password' | 'number'
   label: string
   placeholder?: string
+  rows?: number
   register: UseFormRegisterReturn
   formState: FormState<T>
 }): React.ReactElement {
@@ -27,11 +27,11 @@ export function TextField<T extends FieldValues = FieldValues>({
     <label className="mb-6 flex flex-col last:mb-0">
       <span className="mb-3 block font-medium leading-none">{label}</span>
 
-      <input
-        type={type}
+      <textarea
         placeholder={placeholder}
+        rows={rows}
         className={twMerge(
-          'block h-10 max-w-lg rounded bg-white px-4 font-medium shadow-sm outline outline-1 outline-gray-900/10 focus:outline-primary focus:ring-4 focus:ring-primary/30',
+          'block max-w-lg resize-y rounded bg-white px-4 py-3 font-medium shadow-sm outline outline-1 outline-gray-900/10 focus:outline-primary focus:ring-4 focus:ring-primary/30',
           hasError && 'outline-red-700 focus:outline-red-600 focus:ring-red-300'
         )}
         {...register}
