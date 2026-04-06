@@ -187,6 +187,15 @@ export function FeedbackForm({
           label={t('feedback.files')}
           files={files}
           onFilesChange={setFiles}
+          texts={{
+            click: t('feedback.files.click'),
+            drop: t('feedback.files.drop'),
+            paste: t('feedback.files.paste'),
+            max: t('feedback.files.max'),
+            perFile: t('feedback.files.perFile'),
+            dropOverlayTitle: t('drop.title'),
+            dropOverlayDesc: t('drop.desc'),
+          }}
         />
 
         <SubmitField isLoading={formState.isSubmitting}>

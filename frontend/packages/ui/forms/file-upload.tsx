@@ -38,13 +38,30 @@ export function FileUpload({
   files,
   onFilesChange,
   error,
-  label
+  label,
+  texts
 }: {
   files: File[]
   onFilesChange: (files: File[]) => void
   error?: string
   label?: string
+  texts?: {
+    click?: string
+    drop?: string
+    paste?: string
+    max?: string
+    perFile?: string
+    dropOverlayTitle?: string
+    dropOverlayDesc?: string
+  }
 }): React.ReactElement {
+  const clickText = texts?.click ?? 'Нажмите для загрузки'
+  const dropText = texts?.drop ?? 'или перетащите файлы'
+  const pasteText = texts?.paste ?? 'Также можно вставить из буфера (Ctrl+V).'
+  const maxText = texts?.max ?? 'Макс.'
+  const perFileText = texts?.perFile ?? 'на файл'
+  const overlayTitle = texts?.dropOverlayTitle ?? 'Отпустите для загрузки'
+  const overlayDesc = texts?.dropOverlayDesc ?? 'Файлы будут прикреплены к отзыву'
   const inputRef = useRef<HTMLInputElement>(null)
   const previewsRef = useRef<Map<string, string>>(new Map())
   const entriesRef = useRef<FileEntry[]>([])
@@ -241,7 +258,7 @@ export function FileUpload({
                 viewBox="0 0 24 24"
                 aria-hidden="true"
               >
-                <title>Перетащите файлы</title>
+                <title>{overlayTitle}</title>
                 <path
                   strokeLinecap="round"
                   strokeLinejoin="round"
@@ -251,10 +268,10 @@ export function FileUpload({
               </svg>
             </div>
             <p className="text-xl font-bold text-foreground">
-              Отпустите для загрузки
+              {overlayTitle}
             </p>
             <p className="mt-2 text-sm text-muted-foreground">
-              Файлы будут прикреплены к отзыву
+              {overlayDesc}
             </p>
           </div>
         </div>
@@ -318,13 +335,12 @@ export function FileUpload({
           </svg>
           <p className="text-sm text-gray-600">
             <span className="font-medium text-primary">
-              Нажмите для загрузки
+              {clickText}
             </span>{' '}
-            или перетащите файлы
+            {dropText}
           </p>
           <p className="mt-1 text-xs text-gray-400">
-            Также можно вставить из буфера (Ctrl+V). Макс.{' '}
-            {formatSize(MAX_FILE_SIZE)} на файл
+            {pasteText} {maxText} {formatSize(MAX_FILE_SIZE)} {perFileText}
           </p>
         </div>
 
