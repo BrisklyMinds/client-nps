@@ -12,6 +12,7 @@ dependencies = [
     "django-cors-headers>=4.0",
     "qrcode[pil]>=7.4",
     "django-filter>=24.0",
+    "python-telegram-bot>=21.0",
 ]
 
 [dependency-groups]

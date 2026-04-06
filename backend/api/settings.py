@@ -145,6 +145,12 @@ CORS_ALLOW_ALL_ORIGINS = True
 CORS_ALLOW_CREDENTIALS = True
 
 ######################################################################
+# Telegram Bot
+######################################################################
+TELEGRAM_BOT_TOKEN = environ.get("TELEGRAM_BOT_TOKEN", "")
+TELEGRAM_CHAT_ID = environ.get("TELEGRAM_CHAT_ID", "")
+
+######################################################################
 # Rest Framework
 ######################################################################
 REST_FRAMEWORK = {
