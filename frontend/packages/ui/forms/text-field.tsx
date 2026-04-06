@@ -31,7 +31,7 @@ export function TextField<T extends FieldValues = FieldValues>({
         type={type}
         placeholder={placeholder}
         className={twMerge(
-          'block h-10 max-w-lg rounded bg-white px-4 font-medium shadow-sm outline outline-1 outline-gray-900/10 focus:outline-primary focus:ring-4 focus:ring-primary/30',
+          'block h-10 w-full rounded bg-white px-4 font-medium shadow-sm outline outline-1 outline-gray-900/10 focus:outline-primary focus:ring-4 focus:ring-primary/30',
           hasError && 'outline-red-700 focus:outline-red-600 focus:ring-red-300'
         )}
         {...register}

@@ -70,7 +70,7 @@ export function SelectField({
         onClick={() => !disabled && setIsOpen((o) => !o)}
         onKeyDown={handleKeyDown}
         className={twMerge(
-          'flex h-11 max-w-lg items-center justify-between rounded-lg bg-white px-4 text-left font-medium shadow-sm outline outline-1 outline-gray-200 transition-all',
+          'flex h-11 w-full items-center justify-between rounded-lg bg-white px-4 text-left font-medium shadow-sm outline outline-1 outline-gray-200 transition-all',
           'hover:outline-primary/50 focus:outline-primary focus:ring-4 focus:ring-primary/30',
           isOpen && 'outline-primary ring-4 ring-primary/30',
           error && 'outline-red-400 focus:outline-red-500 focus:ring-red-200',
@@ -105,7 +105,7 @@ export function SelectField({
       {isOpen && (
         <ul
           role="listbox"
-          className="absolute top-full z-20 mt-1 max-h-60 w-full max-w-lg overflow-auto rounded-lg border border-gray-200 bg-white py-1 shadow-lg"
+          className="absolute top-full z-20 mt-1 max-h-60 w-full w-full overflow-auto rounded-lg border border-gray-200 bg-white py-1 shadow-lg"
           style={{ animation: 'dropdownIn 150ms ease-out' }}
         >
           {options.map((opt) => {
