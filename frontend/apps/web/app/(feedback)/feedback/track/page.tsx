@@ -1,28 +1,15 @@
-import type { Metadata } from 'next'
+'use client'
 
-export const metadata: Metadata = {
-  title: 'Отслеживание заявки - КСВ'
-}
-
-const STATUS_LABELS: Record<string, string> = {
-  new: 'Новая',
-  in_progress: 'В работе',
-  resolved: 'Решена',
-  rejected: 'Отклонена'
-}
+import { useEffect, useState } from 'react'
+import { useSearchParams } from 'next/navigation'
+import { Suspense } from 'react'
+import { useT } from '@/lib/lang-context'
 
 const STATUS_COLORS: Record<string, string> = {
   new: 'bg-blue-100 text-blue-700',
   in_progress: 'bg-yellow-100 text-yellow-700',
   resolved: 'bg-green-100 text-green-700',
   rejected: 'bg-red-100 text-red-700'
-}
-
-const TYPE_LABELS: Record<string, string> = {
-  bug: 'Проблема',
-  review: 'Отзыв',
-  suggestion: 'Предложение',
-  other: 'Другое'
 }
 
 interface StatusLog {
@@ -43,12 +30,92 @@ interface TrackData {
   created_at: string
 }
 
-export default async function TrackPage({
-  searchParams
-}: {
-  searchParams: Promise<{ id?: string }>
-}) {
-  const { id } = await searchParams
+function CopyableId({ text }: { text: string }) {
+  const [copied, setCopied] = useState(false)
+
+  const handleCopy = async () => {
+    await navigator.clipboard.writeText(text)
+    setCopied(true)
+    setTimeout(() => setCopied(false), 2000)
+  }
+
+  return (
+    <div className="flex items-center gap-2">
+      <button
+        type="button"
+        onClick={handleCopy}
+        className="font-mono text-2xl font-bold tracking-widest text-primary transition-colors hover:text-primary/70"
+        title="Нажмите чтобы скопировать"
+      >
+        {text}
+      </button>
+      <button
+        type="button"
+        onClick={handleCopy}
+        className="rounded-md p-1.5 text-muted-foreground transition-colors hover:bg-primary/10 hover:text-primary"
+        aria-label="Скопировать ID"
+      >
+        {copied ? (
+          <svg className="h-5 w-5 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+            <title>Скопировано</title>
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4.5 12.75l6 6 9-13.5" />
+          </svg>
+        ) : (
+          <svg className="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+            <title>Копировать</title>
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M15.75 17.25v3.375c0 .621-.504 1.125-1.125 1.125h-9.75a1.125 1.125 0 0 1-1.125-1.125V7.875c0-.621.504-1.125 1.125-1.125H6.75a9.06 9.06 0 0 1 1.5.124m7.5 10.376h3.375c.621 0 1.125-.504 1.125-1.125V11.25c0-4.46-3.243-8.161-7.5-8.876a9.06 9.06 0 0 0-1.5-.124H9.375c-.621 0-1.125.504-1.125 1.125v3.5m7.5 10.375H9.375a1.125 1.125 0 0 1-1.125-1.125v-9.25m12 6.625v-1.875a3.375 3.375 0 0 0-3.375-3.375h-1.5a1.125 1.125 0 0 1-1.125-1.125v-1.5a3.375 3.375 0 0 0-3.375-3.375H9.75" />
+          </svg>
+        )}
+      </button>
+    </div>
+  )
+}
+
+function TrackContent() {
+  const t = useT()
+  const searchParams = useSearchParams()
+  const id = searchParams.get('id')
+  const [data, setData] = useState<TrackData | null>(null)
+  const [loading, setLoading] = useState(true)
+  const [notFound, setNotFound] = useState(false)
+
+  const STATUS_LABELS: Record<string, string> = {
+    new: t('feedback.status.new') ?? 'Новая',
+    in_progress: t('feedback.status.in_progress') ?? 'В работе',
+    resolved: t('feedback.status.resolved') ?? 'Решена',
+    rejected: t('feedback.status.rejected') ?? 'Отклонена'
+  }
+
+  const TYPE_LABELS: Record<string, string> = {
+    bug: t('feedback.type.bug'),
+    review: t('feedback.type.review'),
+    suggestion: t('feedback.type.suggestion'),
+    corruption: t('feedback.type.corruption'),
+    other: t('feedback.type.other')
+  }
+
+  useEffect(() => {
+    if (!id) {
+      setLoading(false)
+      return
+    }
+    fetch(`/api/feedback/track/${id}/`)
+      .then((r) => (r.ok ? r.json() : null))
+      .then((d) => {
+        if (d) setData(d)
+        else setNotFound(true)
+      })
+      .catch(() => setNotFound(true))
+      .finally(() => setLoading(false))
+  }, [id])
+
+  if (loading) {
+    return (
+      <div className="rounded-lg bg-card p-6 text-center shadow-sm">
+        <p className="text-muted-foreground">Загрузка...</p>
+      </div>
+    )
+  }
 
   if (!id) {
     return (
@@ -61,18 +128,7 @@ export default async function TrackPage({
     )
   }
 
-  let data: TrackData | null = null
-  try {
-    const res = await fetch(
-      `${process.env.API_URL}/api/feedback/track/${id}/`,
-      { cache: 'no-store' }
-    )
-    if (res.ok) data = await res.json()
-  } catch {
-    // fallback
-  }
-
-  if (!data) {
+  if (notFound || !data) {
     return (
       <div className="rounded-lg bg-card p-6 text-center shadow-sm">
         <h1 className="mb-2 text-xl font-bold">Заявка не найдена</h1>
@@ -91,9 +147,7 @@ export default async function TrackPage({
         <div className="mb-4 flex items-start justify-between">
           <div>
             <p className="text-xs text-muted-foreground">ID заявки</p>
-            <p className="font-mono text-2xl font-bold tracking-widest text-primary">
-              {data.short_id}
-            </p>
+            <CopyableId text={data.short_id} />
           </div>
           <span
             className={`rounded-full px-3 py-1 text-sm font-medium ${statusColor}`}
@@ -136,7 +190,7 @@ export default async function TrackPage({
               <div key={log.id} className="relative flex gap-4 pb-6 last:pb-0">
                 <div
                   className={`relative z-10 mt-1 h-6 w-6 shrink-0 rounded-full border-2 border-white ${
-                    STATUS_COLORS[log.status]?.replace('text-', 'bg-').split(' ')[0] ?? 'bg-gray-200'
+                    STATUS_COLORS[log.status]?.split(' ')[0] ?? 'bg-gray-200'
                   }`}
                 />
                 <div className="min-w-0 flex-1">
@@ -165,5 +219,13 @@ export default async function TrackPage({
         )}
       </div>
     </div>
+  )
+}
+
+export default function TrackPage() {
+  return (
+    <Suspense fallback={null}>
+      <TrackContent />
+    </Suspense>
   )
 }
