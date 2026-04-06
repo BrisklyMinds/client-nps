@@ -50,12 +50,8 @@ const changePasswordFormSchema = z
 const feedbackFormSchema = z
   .object({
     systemSlug: z.string().min(1),
-    phone: z
-      .string()
-      .min(7, 'Минимум 7 символов')
-      .max(20)
-      .regex(/^\+?[\d\s\-()]+$/, 'Некорректный номер телефона'),
-    feedbackType: z.enum(['bug', 'review', 'suggestion', 'other']),
+    phone: z.string().optional().default(''),
+    feedbackType: z.enum(['bug', 'review', 'suggestion', 'corruption', 'other']),
     rating: z.number().min(1).max(5).optional().nullable(),
     comment: z.string().min(10, 'Минимум 10 символов')
   })
@@ -66,6 +62,15 @@ const feedbackFormSchema = z
     {
       message: 'Оценка обязательна для отзывов',
       path: ['rating']
+    }
+  )
+  .refine(
+    (data) =>
+      data.feedbackType === 'corruption' ||
+      (data.phone && data.phone.length >= 7),
+    {
+      message: 'Минимум 7 символов',
+      path: ['phone']
     }
   )
 

@@ -17,6 +17,7 @@ FEEDBACK_TYPE_EMOJI = {
     "bug": "\U0001f41b",
     "review": "\u2b50",
     "suggestion": "\U0001f4a1",
+    "corruption": "\U0001f6a8",
     "other": "\U0001f4dd",
 }
 
@@ -24,6 +25,7 @@ FEEDBACK_TYPE_LABEL = {
     "bug": "Проблема",
     "review": "Отзыв",
     "suggestion": "Предложение",
+    "corruption": "Коррупция",
     "other": "Другое",
 }
 

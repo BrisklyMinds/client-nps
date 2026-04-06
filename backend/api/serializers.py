@@ -180,16 +180,24 @@ class FeedbackCreateSerializer(serializers.ModelSerializer):
         model = Feedback
         fields = ["tracking_id", "system_slug", "phone", "feedback_type", "rating", "comment", "files"]
         read_only_fields = ["tracking_id"]
+        extra_kwargs = {
+            "phone": {"required": False, "allow_blank": True},
+        }
 
     def validate(self, attrs):
-        if attrs.get("feedback_type") == FeedbackType.REVIEW and not attrs.get(
-            "rating"
-        ):
+        fb_type = attrs.get("feedback_type")
+        if fb_type == FeedbackType.REVIEW and not attrs.get("rating"):
             raise serializers.ValidationError(
                 {"rating": _("Rating is required for reviews.")}
             )
-        if attrs.get("feedback_type") != FeedbackType.REVIEW:
+        if fb_type != FeedbackType.REVIEW:
             attrs["rating"] = None
+        if fb_type != FeedbackType.CORRUPTION and not attrs.get("phone"):
+            raise serializers.ValidationError(
+                {"phone": _("Phone number is required.")}
+            )
+        if fb_type == FeedbackType.CORRUPTION:
+            attrs["phone"] = ""
         return attrs
 
     def create(self, validated_data):

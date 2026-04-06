@@ -41,6 +41,7 @@ class FeedbackType(models.TextChoices):
     BUG = "bug", _("System Problem")
     REVIEW = "review", _("Review")
     SUGGESTION = "suggestion", _("Suggestion")
+    CORRUPTION = "corruption", _("Corruption Report")
     OTHER = "other", _("Other")
 
 
@@ -61,7 +62,7 @@ class Feedback(models.Model):
         related_name="feedbacks",
         verbose_name=_("system"),
     )
-    phone = models.CharField(_("phone number"), max_length=20)
+    phone = models.CharField(_("phone number"), max_length=20, blank=True, default="")
     feedback_type = models.CharField(
         _("feedback type"),
         max_length=20,

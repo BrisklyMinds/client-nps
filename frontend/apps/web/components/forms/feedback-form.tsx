@@ -41,6 +41,7 @@ export function FeedbackForm({
     { value: 'bug', label: t('feedback.type.bug') },
     { value: 'review', label: t('feedback.type.review') },
     { value: 'suggestion', label: t('feedback.type.suggestion') },
+    { value: 'corruption', label: t('feedback.type.corruption') },
     { value: 'other', label: t('feedback.type.other') }
   ]
 
@@ -138,13 +139,15 @@ export function FeedbackForm({
           )}
         />
 
-        <TextField
-          type="text"
-          label={t('feedback.phone')}
-          placeholder={t('feedback.phone.placeholder')}
-          register={register('phone')}
-          formState={formState}
-        />
+        {feedbackType !== 'corruption' && (
+          <TextField
+            type="text"
+            label={t('feedback.phone')}
+            placeholder={t('feedback.phone.placeholder')}
+            register={register('phone')}
+            formState={formState}
+          />
+        )}
 
         <Controller
           control={control}
