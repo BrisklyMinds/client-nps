@@ -207,7 +207,7 @@ class SystemViewSet(viewsets.ModelViewSet):
     lookup_field = "slug"
 
     def get_permissions(self):
-        if self.action == "public":
+        if self.action in ("public", "active_list"):
             return [AllowAny()]
         return super().get_permissions()
 
@@ -223,9 +223,21 @@ class SystemViewSet(viewsets.ModelViewSet):
     def get_serializer_class(self):
         if self.action == "list":
             return SystemListSerializer
-        if self.action == "public":
+        if self.action in ("public", "active_list"):
             return SystemPublicSerializer
         return SystemSerializer
+
+    @extend_schema(responses={200: SystemPublicSerializer(many=True)})
+    @action(
+        detail=False,
+        methods=["get"],
+        url_path="active",
+        permission_classes=[AllowAny],
+    )
+    def active_list(self, request):
+        qs = System.objects.filter(is_active=True).order_by("name")
+        serializer = SystemPublicSerializer(qs, many=True)
+        return Response(serializer.data)
 
     @extend_schema(responses={200: SystemPublicSerializer})
     @action(

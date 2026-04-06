@@ -12,6 +12,7 @@ import {
 import { fieldApiError } from '@/lib/forms'
 import { TextField } from '@frontend/ui/forms/text-field'
 import { TextAreaField } from '@frontend/ui/forms/textarea-field'
+import { SelectField } from '@frontend/ui/forms/select-field'
 import { RadioGroup } from '@frontend/ui/forms/radio-group'
 import { StarRating } from '@frontend/ui/forms/star-rating'
 import { FileUpload } from '@frontend/ui/forms/file-upload'
@@ -25,16 +26,31 @@ const FEEDBACK_TYPE_OPTIONS = [
   { value: 'other', label: 'Другое' }
 ]
 
+interface SystemOption {
+  name: string
+  slug: string
+}
+
 export function FeedbackForm({
-  systemSlug,
-  systemName
+  systems,
+  preselectedSlug
 }: {
-  systemSlug: string
-  systemName: string
+  systems: SystemOption[]
+  preselectedSlug?: string
 }) {
   const router = useRouter()
   const [files, setFiles] = useState<File[]>([])
   const [serverError, setServerError] = useState<string | null>(null)
+
+  const systemOptions = systems.map((s) => ({
+    value: s.slug,
+    label: s.name
+  }))
+
+  const defaultSlug =
+    preselectedSlug && systems.some((s) => s.slug === preselectedSlug)
+      ? preselectedSlug
+      : ''
 
   const {
     register,
@@ -46,13 +62,15 @@ export function FeedbackForm({
   } = useForm<FeedbackFormSchema>({
     resolver: zodResolver(feedbackFormSchema),
     defaultValues: {
-      systemSlug,
+      systemSlug: defaultSlug,
       feedbackType: 'review',
       rating: null
     }
   })
 
   const feedbackType = watch('feedbackType')
+  const selectedSlug = watch('systemSlug')
+  const selectedSystem = systems.find((s) => s.slug === selectedSlug)
 
   const onSubmit = async (data: FeedbackFormSchema) => {
     setServerError(null)
@@ -89,15 +107,34 @@ export function FeedbackForm({
     <div className="rounded-lg bg-card p-6 shadow-sm">
       <div className="mb-6">
         <h1 className="text-xl font-bold">Обратная связь</h1>
-        <p className="mt-1 text-sm text-muted-foreground">
-          Система: <span className="font-medium text-foreground">{systemName}</span>
-        </p>
+        {selectedSystem && (
+          <p className="mt-1 text-sm text-muted-foreground">
+            Система:{' '}
+            <span className="font-medium text-foreground">
+              {selectedSystem.name}
+            </span>
+          </p>
+        )}
       </div>
 
       {serverError && <ErrorMessage>{serverError}</ErrorMessage>}
 
       <form onSubmit={handleSubmit(onSubmit)}>
-        <input type="hidden" {...register('systemSlug')} />
+        <Controller
+          control={control}
+          name="systemSlug"
+          render={({ field, fieldState }) => (
+            <SelectField
+              label="Система"
+              options={systemOptions}
+              value={field.value}
+              onChange={field.onChange}
+              placeholder="Выберите систему"
+              error={fieldState.error?.message}
+              disabled={!!preselectedSlug && defaultSlug !== ''}
+            />
+          )}
+        />
 
         <TextField
           type="text"
