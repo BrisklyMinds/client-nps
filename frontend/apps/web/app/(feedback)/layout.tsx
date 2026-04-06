@@ -12,9 +12,19 @@ export default function FeedbackLayout({
   children: React.ReactNode
 }) {
   return (
-    <div className="flex min-h-dvh flex-col items-center bg-background px-4 py-8">
-      <div className="mb-8">
-        <Image src="/logo.svg" alt="KSW Logo" width={120} height={100} priority />
+    <div className="flex min-h-dvh flex-col items-center bg-background px-4 py-6 sm:py-10">
+      <div className="mb-5 flex items-center gap-2.5 sm:mb-8">
+        <Image
+          src="/logo.svg"
+          alt="KSW"
+          width={36}
+          height={30}
+          className="h-7 w-auto sm:h-9"
+          priority
+        />
+        <span className="text-sm font-bold tracking-tight text-foreground sm:text-base">
+          Kyrgyz Single Window
+        </span>
       </div>
       <div className="w-full max-w-md">{children}</div>
     </div>
