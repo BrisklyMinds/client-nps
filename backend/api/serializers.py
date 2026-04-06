@@ -5,7 +5,7 @@ from django.db import transaction
 from django.utils.translation import gettext_lazy as _
 from rest_framework import exceptions, serializers
 
-from .models import Feedback, FeedbackFile, FeedbackType, System
+from .models import Feedback, FeedbackFile, FeedbackStatusLog, FeedbackType, System
 
 User = get_user_model()
 
@@ -178,7 +178,8 @@ class FeedbackCreateSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Feedback
-        fields = ["system_slug", "phone", "feedback_type", "rating", "comment", "files"]
+        fields = ["tracking_id", "system_slug", "phone", "feedback_type", "rating", "comment", "files"]
+        read_only_fields = ["tracking_id"]
 
     def validate(self, attrs):
         if attrs.get("feedback_type") == FeedbackType.REVIEW and not attrs.get(
@@ -219,20 +220,40 @@ class FeedbackCreateErrorSerializer(serializers.Serializer):
     files = serializers.ListSerializer(child=serializers.CharField(), required=False)
 
 
+class FeedbackStatusLogSerializer(serializers.ModelSerializer):
+    operator_name = serializers.SerializerMethodField()
+
+    class Meta:
+        model = FeedbackStatusLog
+        fields = ["id", "status", "comment", "operator_name", "created_at"]
+
+    def get_operator_name(self, obj):
+        if obj.operator:
+            return obj.operator.get_full_name() or obj.operator.username
+        return None
+
+
 class FeedbackDetailSerializer(serializers.ModelSerializer):
     system = SystemSerializer(read_only=True)
     files = FeedbackFileSerializer(many=True, read_only=True)
+    status_logs = FeedbackStatusLogSerializer(many=True, read_only=True)
+    short_id = serializers.CharField(read_only=True)
 
     class Meta:
         model = Feedback
         fields = [
             "id",
+            "tracking_id",
+            "short_id",
             "system",
             "phone",
             "feedback_type",
             "rating",
             "comment",
+            "status",
+            "is_public",
             "files",
+            "status_logs",
             "created_at",
         ]
 
@@ -240,16 +261,20 @@ class FeedbackDetailSerializer(serializers.ModelSerializer):
 class FeedbackListSerializer(serializers.ModelSerializer):
     system_name = serializers.CharField(source="system.name", read_only=True)
     files_count = serializers.IntegerField(source="files.count", read_only=True)
+    short_id = serializers.CharField(read_only=True)
 
     class Meta:
         model = Feedback
         fields = [
             "id",
+            "tracking_id",
+            "short_id",
             "system_name",
             "phone",
             "feedback_type",
             "rating",
             "comment",
+            "status",
             "files_count",
             "created_at",
         ]
@@ -260,3 +285,44 @@ class FeedbackStatsSerializer(serializers.Serializer):
     average_rating = serializers.FloatField(allow_null=True)
     by_type = serializers.DictField(child=serializers.IntegerField())
     by_system = serializers.ListField(child=serializers.DictField())
+
+
+class FeedbackUpdateStatusSerializer(serializers.Serializer):
+    status = serializers.ChoiceField(choices=["new", "in_progress", "resolved", "rejected"])
+    comment = serializers.CharField(required=False, default="")
+
+
+class FeedbackTrackSerializer(serializers.ModelSerializer):
+    system_name = serializers.CharField(source="system.name", read_only=True)
+    status_logs = FeedbackStatusLogSerializer(many=True, read_only=True)
+    short_id = serializers.CharField(read_only=True)
+
+    class Meta:
+        model = Feedback
+        fields = [
+            "tracking_id",
+            "short_id",
+            "system_name",
+            "feedback_type",
+            "status",
+            "status_logs",
+            "created_at",
+        ]
+
+
+class FeedbackPublicIncidentSerializer(serializers.ModelSerializer):
+    system_name = serializers.CharField(source="system.name", read_only=True)
+    status_logs = FeedbackStatusLogSerializer(many=True, read_only=True)
+    short_id = serializers.CharField(read_only=True)
+
+    class Meta:
+        model = Feedback
+        fields = [
+            "short_id",
+            "system_name",
+            "feedback_type",
+            "comment",
+            "status",
+            "status_logs",
+            "created_at",
+        ]

@@ -53,7 +53,7 @@ def test_system_slug_unique(system_factory):
 def test_feedback_str(feedback_factory):
     fb = feedback_factory.create()
     assert fb.system.name in str(fb)
-    assert "Review" in str(fb)
+    assert "New" in str(fb)
 
 
 @pytest.mark.django_db

@@ -89,12 +89,12 @@ export function FeedbackForm({
 
     const res = await feedbackAction(formData)
 
-    if (res === true) {
-      router.push('/feedback/success')
+    if ('tracking_id' in res) {
+      router.push(`/feedback/success?id=${res.tracking_id}`)
       return
     }
 
-    if (typeof res !== 'boolean') {
+    if (!('tracking_id' in res)) {
       fieldApiError('phone', 'phone', res, setError)
       fieldApiError('comment', 'comment', res, setError)
       fieldApiError('system_slug', 'systemSlug', res, setError)
