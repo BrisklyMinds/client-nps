@@ -1,10 +1,10 @@
-import type { Metadata } from 'next'
+'use client'
 
-export const metadata: Metadata = {
-  title: 'Спасибо! - КСВ'
-}
+import { useT } from '@/lib/lang-context'
 
 export default function FeedbackSuccessPage() {
+  const t = useT()
+
   return (
     <div className="rounded-lg bg-card p-8 text-center shadow-sm">
       <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-primary/10">
@@ -13,7 +13,9 @@ export default function FeedbackSuccessPage() {
           fill="none"
           stroke="currentColor"
           viewBox="0 0 24 24"
+          aria-hidden="true"
         >
+          <title>{t('success.title')}</title>
           <path
             strokeLinecap="round"
             strokeLinejoin="round"
@@ -22,10 +24,8 @@ export default function FeedbackSuccessPage() {
           />
         </svg>
       </div>
-      <h1 className="mb-2 text-2xl font-bold">Спасибо!</h1>
-      <p className="text-muted-foreground">
-        Ваш отзыв успешно отправлен. Мы обязательно его рассмотрим.
-      </p>
+      <h1 className="mb-2 text-2xl font-bold">{t('success.title')}</h1>
+      <p className="text-muted-foreground">{t('success.desc')}</p>
     </div>
   )
 }

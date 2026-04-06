@@ -10,6 +10,7 @@ import {
   type FeedbackFormSchema
 } from '@/lib/validation'
 import { fieldApiError } from '@/lib/forms'
+import { useT } from '@/lib/lang-context'
 import { TextField } from '@frontend/ui/forms/text-field'
 import { TextAreaField } from '@frontend/ui/forms/textarea-field'
 import { SelectField } from '@frontend/ui/forms/select-field'
@@ -18,13 +19,6 @@ import { StarRating } from '@frontend/ui/forms/star-rating'
 import { FileUpload } from '@frontend/ui/forms/file-upload'
 import { SubmitField } from '@frontend/ui/forms/submit-field'
 import { ErrorMessage } from '@frontend/ui/messages/error-message'
-
-const FEEDBACK_TYPE_OPTIONS = [
-  { value: 'bug', label: 'Проблема' },
-  { value: 'review', label: 'Отзыв' },
-  { value: 'suggestion', label: 'Предложение' },
-  { value: 'other', label: 'Другое' }
-]
 
 interface SystemOption {
   name: string
@@ -39,8 +33,16 @@ export function FeedbackForm({
   preselectedSlug?: string
 }) {
   const router = useRouter()
+  const t = useT()
   const [files, setFiles] = useState<File[]>([])
   const [serverError, setServerError] = useState<string | null>(null)
+
+  const feedbackTypeOptions = [
+    { value: 'bug', label: t('feedback.type.bug') },
+    { value: 'review', label: t('feedback.type.review') },
+    { value: 'suggestion', label: t('feedback.type.suggestion') },
+    { value: 'other', label: t('feedback.type.other') }
+  ]
 
   const systemOptions = systems.map((s) => ({
     value: s.slug,
@@ -106,10 +108,10 @@ export function FeedbackForm({
   return (
     <div className="rounded-lg bg-card p-6 shadow-sm">
       <div className="mb-6">
-        <h1 className="text-xl font-bold">Обратная связь</h1>
+        <h1 className="text-xl font-bold">{t('feedback.title')}</h1>
         {selectedSystem && (
           <p className="mt-1 text-sm text-muted-foreground">
-            Система:{' '}
+            {t('feedback.system.label')}{' '}
             <span className="font-medium text-foreground">
               {selectedSystem.name}
             </span>
@@ -125,11 +127,11 @@ export function FeedbackForm({
           name="systemSlug"
           render={({ field, fieldState }) => (
             <SelectField
-              label="Система"
+              label={t('feedback.system')}
               options={systemOptions}
               value={field.value}
               onChange={field.onChange}
-              placeholder="Выберите систему"
+              placeholder={t('feedback.system.placeholder')}
               error={fieldState.error?.message}
               disabled={!!preselectedSlug && defaultSlug !== ''}
             />
@@ -138,8 +140,8 @@ export function FeedbackForm({
 
         <TextField
           type="text"
-          label="Телефон"
-          placeholder="+996 XXX XXX XXX"
+          label={t('feedback.phone')}
+          placeholder={t('feedback.phone.placeholder')}
           register={register('phone')}
           formState={formState}
         />
@@ -149,8 +151,8 @@ export function FeedbackForm({
           name="feedbackType"
           render={({ field, fieldState }) => (
             <RadioGroup
-              label="Тип обращения"
-              options={FEEDBACK_TYPE_OPTIONS}
+              label={t('feedback.type')}
+              options={feedbackTypeOptions}
               value={field.value}
               onChange={field.onChange}
               error={fieldState.error?.message}
@@ -164,7 +166,7 @@ export function FeedbackForm({
             name="rating"
             render={({ field, fieldState }) => (
               <StarRating
-                label="Оценка"
+                label={t('feedback.rating')}
                 value={field.value}
                 onChange={field.onChange}
                 error={fieldState.error?.message}
@@ -174,21 +176,21 @@ export function FeedbackForm({
         )}
 
         <TextAreaField
-          label="Комментарий"
-          placeholder="Опишите вашу проблему или оставьте отзыв..."
+          label={t('feedback.comment')}
+          placeholder={t('feedback.comment.placeholder')}
           rows={4}
           register={register('comment')}
           formState={formState}
         />
 
         <FileUpload
-          label="Прикрепить файлы"
+          label={t('feedback.files')}
           files={files}
           onFilesChange={setFiles}
         />
 
         <SubmitField isLoading={formState.isSubmitting}>
-          Отправить
+          {t('feedback.submit')}
         </SubmitField>
       </form>
     </div>
