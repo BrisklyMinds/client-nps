@@ -38,7 +38,7 @@ export default async function SystemsListPage() {
       <div className="mb-6 flex items-center justify-between">
         <h1 className="text-2xl font-bold">Системы</h1>
         <Link
-          href="/admin/systems/new"
+          href="/panel/systems/new"
           className="rounded bg-primary px-4 py-2 text-sm font-medium text-primary-foreground"
         >
           Добавить систему
@@ -60,7 +60,7 @@ export default async function SystemsListPage() {
               <tr key={sys.id} className="border-b last:border-0 hover:bg-muted/50">
                 <td className="px-4 py-3">
                   <Link
-                    href={`/admin/systems/${sys.slug}`}
+                    href={`/panel/systems/${sys.slug}`}
                     className="font-medium text-primary hover:underline"
                   >
                     {sys.name}

@@ -75,7 +75,15 @@ export function FeedbackLayoutClient({
 
   return (
     <LangProvider value={lang}>
-      <div className="flex min-h-dvh flex-col items-center bg-background px-4 py-6 sm:px-6 sm:py-10 lg:py-14">
+      <div
+        className="flex min-h-dvh flex-col items-center px-4 py-6 sm:px-6 sm:py-10 lg:py-14"
+        style={{
+          backgroundColor: 'hsl(var(--background))',
+          backgroundImage: 'url(/pattern-tile.png)',
+          backgroundRepeat: 'repeat',
+          backgroundSize: '80px 80px',
+        }}
+      >
         <Header lang={lang} setLang={setLang} />
         <div className="w-full max-w-[480px] lg:max-w-[540px]">{children}</div>
       </div>

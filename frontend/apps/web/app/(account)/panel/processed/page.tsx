@@ -94,7 +94,7 @@ export default async function ProcessedPage({
     const q = new URLSearchParams()
     q.set('status', status)
     if (params.system__slug) q.set('system__slug', params.system__slug)
-    return `/admin/processed?${q.toString()}`
+    return `/panel/processed?${q.toString()}`
   }
 
   return (
@@ -184,7 +184,7 @@ export default async function ProcessedPage({
                   >
                     <td className="px-4 py-3">
                       <Link
-                        href={`/admin/feedback/${fb.id}`}
+                        href={`/panel/feedback/${fb.id}`}
                         className="font-mono text-xs font-semibold text-primary hover:underline"
                       >
                         #{shortId}

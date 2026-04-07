@@ -2,7 +2,7 @@ import { getServerSession } from 'next-auth'
 import { authOptions } from '@/lib/auth'
 import Link from 'next/link'
 import { notFound } from 'next/navigation'
-import { StatusUpdateForm } from '@/components/admin/status-update-form'
+import { StatusUpdateForm } from '@/components/panel/status-update-form'
 
 const TYPE_LABELS: Record<string, { label: string; color: string }> = {
   bug: { label: 'Проблема', color: 'bg-orange-100 text-orange-700' },
@@ -88,7 +88,7 @@ export default async function FeedbackDetailPage({
   return (
     <div className="space-y-5">
       <Link
-        href="/admin/feedback"
+        href="/panel/feedback"
         className="inline-flex items-center gap-1 text-sm text-muted-foreground hover:text-foreground"
       >
         ← Назад к списку

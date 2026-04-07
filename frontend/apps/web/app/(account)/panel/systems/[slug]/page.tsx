@@ -77,7 +77,7 @@ export default function SystemDetailPage({
   return (
     <div>
       <Link
-        href="/admin/systems"
+        href="/panel/systems"
         className="mb-4 inline-block text-sm text-muted-foreground hover:text-foreground"
       >
         &larr; Назад к списку

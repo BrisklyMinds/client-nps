@@ -4,10 +4,10 @@ import { getServerSession } from 'next-auth'
 import { redirect } from 'next/navigation'
 
 const NAV_LINKS = [
-  { href: '/admin/dashboard', label: 'Дашборд' },
-  { href: '/admin/feedback', label: 'Заявки' },
-  { href: '/admin/processed', label: 'Обработанные' },
-  { href: '/admin/systems', label: 'Системы' },
+  { href: '/panel/dashboard', label: 'Дашборд' },
+  { href: '/panel/feedback', label: 'Заявки' },
+  { href: '/panel/processed', label: 'Обработанные' },
+  { href: '/panel/systems', label: 'Системы' },
 ]
 
 export default async function AdminLayout({
@@ -26,7 +26,7 @@ export default async function AdminLayout({
       <nav className="sticky top-0 z-10 border-b bg-card shadow-sm">
         <div className="mx-auto flex max-w-6xl items-center gap-6 px-4 py-0">
           <Link
-            href="/admin/dashboard"
+            href="/panel/dashboard"
             className="shrink-0 py-3 text-base font-bold text-primary"
           >
             NPS

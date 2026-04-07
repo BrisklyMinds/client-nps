@@ -95,7 +95,7 @@ export default async function FeedbackListPage({
       q.delete('status')
     }
     q.delete('page')
-    return `/admin/feedback?${q.toString()}`
+    return `/panel/feedback?${q.toString()}`
   }
 
   return (
@@ -155,7 +155,7 @@ export default async function FeedbackListPage({
                   >
                     <td className="px-4 py-3">
                       <Link
-                        href={`/admin/feedback/${fb.id}`}
+                        href={`/panel/feedback/${fb.id}`}
                         className="font-mono text-xs font-semibold text-primary hover:underline"
                       >
                         #{shortId}
