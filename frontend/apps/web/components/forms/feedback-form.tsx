@@ -10,7 +10,7 @@ import {
   type FeedbackFormSchema
 } from '@/lib/validation'
 import { fieldApiError } from '@/lib/forms'
-import { useT } from '@/lib/lang-context'
+import { useT, useLang } from '@/lib/lang-context'
 import { TextField } from '@frontend/ui/forms/text-field'
 import { TextAreaField } from '@frontend/ui/forms/textarea-field'
 import { SelectField } from '@frontend/ui/forms/select-field'
@@ -22,6 +22,8 @@ import { ErrorMessage } from '@frontend/ui/messages/error-message'
 
 interface SystemOption {
   name: string
+  name_ky?: string
+  name_en?: string
   slug: string
 }
 
@@ -34,6 +36,7 @@ export function FeedbackForm({
 }) {
   const router = useRouter()
   const t = useT()
+  const lang = useLang()
   const [files, setFiles] = useState<File[]>([])
   const [serverError, setServerError] = useState<string | null>(null)
   const [showCorruptionWarning, setShowCorruptionWarning] = useState(false)
@@ -51,7 +54,7 @@ export function FeedbackForm({
 
   const systemOptions = systems.map((s) => ({
     value: s.slug,
-    label: s.name
+    label: (lang === 'ky' && s.name_ky) || (lang === 'en' && s.name_en) || s.name
   }))
 
   const defaultSlug =

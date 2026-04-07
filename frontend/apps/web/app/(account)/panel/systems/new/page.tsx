@@ -9,6 +9,8 @@ export default function NewSystemPage() {
   const { data: session } = useSession()
   const router = useRouter()
   const [name, setName] = useState('')
+  const [nameKy, setNameKy] = useState('')
+  const [nameEn, setNameEn] = useState('')
   const [slug, setSlug] = useState('')
   const [description, setDescription] = useState('')
   const [error, setError] = useState<string | null>(null)
@@ -41,7 +43,7 @@ export default function NewSystemPage() {
           'Content-Type': 'application/json',
           Authorization: `Bearer ${session?.accessToken}`
         },
-        body: JSON.stringify({ name, slug, description })
+        body: JSON.stringify({ name, name_ky: nameKy, name_en: nameEn, slug, description })
       })
 
       if (res.ok) {
@@ -89,6 +91,32 @@ export default function NewSystemPage() {
               onChange={(e) => handleNameChange(e.target.value)}
               className="rounded border bg-background px-3 py-2 text-sm outline-none focus:border-primary focus:ring-2 focus:ring-primary/30"
               placeholder="Например: Единое Окно"
+            />
+          </label>
+
+          <label className="mb-4 flex flex-col">
+            <span className="mb-2 text-sm font-medium">
+              Название на кыргызском <span className="text-muted-foreground">(необязательно)</span>
+            </span>
+            <input
+              type="text"
+              value={nameKy}
+              onChange={(e) => setNameKy(e.target.value)}
+              className="rounded border bg-background px-3 py-2 text-sm outline-none focus:border-primary focus:ring-2 focus:ring-primary/30"
+              placeholder="Мисалы: Бирдиктүү Терезе"
+            />
+          </label>
+
+          <label className="mb-4 flex flex-col">
+            <span className="mb-2 text-sm font-medium">
+              Название на английском <span className="text-muted-foreground">(необязательно)</span>
+            </span>
+            <input
+              type="text"
+              value={nameEn}
+              onChange={(e) => setNameEn(e.target.value)}
+              className="rounded border bg-background px-3 py-2 text-sm outline-none focus:border-primary focus:ring-2 focus:ring-primary/30"
+              placeholder="E.g.: Single Window"
             />
           </label>
 

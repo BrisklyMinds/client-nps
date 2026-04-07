@@ -133,7 +133,7 @@ class UserCreateErrorSerializer(serializers.Serializer):
 class SystemSerializer(serializers.ModelSerializer):
     class Meta:
         model = System
-        fields = ["id", "name", "slug", "description", "is_active", "created_at"]
+        fields = ["id", "name", "name_ky", "name_en", "slug", "description", "is_active", "created_at"]
         read_only_fields = ["id", "created_at"]
 
 
@@ -143,13 +143,13 @@ class SystemListSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = System
-        fields = ["id", "name", "slug", "feedback_count", "average_rating"]
+        fields = ["id", "name", "name_ky", "name_en", "slug", "feedback_count", "average_rating"]
 
 
 class SystemPublicSerializer(serializers.ModelSerializer):
     class Meta:
         model = System
-        fields = ["name", "slug"]
+        fields = ["name", "name_ky", "name_en", "slug"]
 
 
 ######################################################################
@@ -268,6 +268,8 @@ class FeedbackDetailSerializer(serializers.ModelSerializer):
 
 class FeedbackListSerializer(serializers.ModelSerializer):
     system_name = serializers.CharField(source="system.name", read_only=True)
+    system_name_ky = serializers.CharField(source="system.name_ky", read_only=True)
+    system_name_en = serializers.CharField(source="system.name_en", read_only=True)
     files_count = serializers.IntegerField(source="files.count", read_only=True)
     short_id = serializers.CharField(read_only=True)
 
@@ -278,6 +280,8 @@ class FeedbackListSerializer(serializers.ModelSerializer):
             "tracking_id",
             "short_id",
             "system_name",
+            "system_name_ky",
+            "system_name_en",
             "phone",
             "feedback_type",
             "rating",
@@ -303,6 +307,8 @@ class FeedbackUpdateStatusSerializer(serializers.Serializer):
 
 class FeedbackTrackSerializer(serializers.ModelSerializer):
     system_name = serializers.CharField(source="system.name", read_only=True)
+    system_name_ky = serializers.CharField(source="system.name_ky", read_only=True)
+    system_name_en = serializers.CharField(source="system.name_en", read_only=True)
     status_logs = FeedbackStatusLogSerializer(many=True, read_only=True)
     short_id = serializers.CharField(read_only=True)
 
@@ -312,6 +318,8 @@ class FeedbackTrackSerializer(serializers.ModelSerializer):
             "tracking_id",
             "short_id",
             "system_name",
+            "system_name_ky",
+            "system_name_en",
             "feedback_type",
             "status",
             "status_logs",
@@ -321,6 +329,8 @@ class FeedbackTrackSerializer(serializers.ModelSerializer):
 
 class FeedbackPublicIncidentSerializer(serializers.ModelSerializer):
     system_name = serializers.CharField(source="system.name", read_only=True)
+    system_name_ky = serializers.CharField(source="system.name_ky", read_only=True)
+    system_name_en = serializers.CharField(source="system.name_en", read_only=True)
     status_logs = FeedbackStatusLogSerializer(many=True, read_only=True)
     short_id = serializers.CharField(read_only=True)
 
@@ -329,6 +339,8 @@ class FeedbackPublicIncidentSerializer(serializers.ModelSerializer):
         fields = [
             "short_id",
             "system_name",
+            "system_name_ky",
+            "system_name_en",
             "feedback_type",
             "comment",
             "status",

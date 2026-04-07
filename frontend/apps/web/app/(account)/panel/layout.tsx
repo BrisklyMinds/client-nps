@@ -24,7 +24,7 @@ export default async function AdminLayout({
   return (
     <div className="min-h-dvh bg-background">
       <nav className="sticky top-0 z-10 border-b bg-card shadow-sm">
-        <div className="mx-auto flex max-w-6xl items-center gap-2 px-3 sm:gap-4 sm:px-4">
+        <div className="mx-auto flex w-full max-w-6xl items-center gap-2 px-3 sm:gap-4 sm:px-4">
           <Link
             href="/panel/dashboard"
             className="shrink-0 py-3 text-sm font-bold text-primary sm:text-base"
@@ -57,7 +57,7 @@ export default async function AdminLayout({
           </div>
         </div>
       </nav>
-      <main className="mx-auto max-w-6xl px-3 py-4 sm:px-4 sm:py-6">{children}</main>
+      <main className="w-full px-3 py-4 sm:mx-auto sm:max-w-6xl sm:px-4 sm:py-6">{children}</main>
     </div>
   )
 }

@@ -21,6 +21,8 @@ class User(AbstractUser):
 
 class System(models.Model):
     name = models.CharField(_("name"), max_length=255, unique=True)
+    name_ky = models.CharField(_("name (Kyrgyz)"), max_length=255, blank=True, default="")
+    name_en = models.CharField(_("name (English)"), max_length=255, blank=True, default="")
     slug = models.SlugField(_("slug"), max_length=255, unique=True)
     description = models.TextField(_("description"), blank=True, default="")
     is_active = models.BooleanField(_("is active"), default=True)

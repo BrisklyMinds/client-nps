@@ -7,6 +7,8 @@ import Link from 'next/link'
 interface SystemDetail {
   id: number
   name: string
+  name_ky: string
+  name_en: string
   slug: string
   description: string
   is_active: boolean
@@ -88,6 +90,18 @@ export default function SystemDetailPage({
           <h1 className="mb-4 text-xl font-bold">{system.name}</h1>
 
           <div className="space-y-3 text-sm">
+            {system.name_ky && (
+              <div>
+                <span className="text-muted-foreground">Кыргызча: </span>
+                <span>{system.name_ky}</span>
+              </div>
+            )}
+            {system.name_en && (
+              <div>
+                <span className="text-muted-foreground">English: </span>
+                <span>{system.name_en}</span>
+              </div>
+            )}
             <div>
               <span className="text-muted-foreground">Slug: </span>
               <span className="font-mono">{system.slug}</span>
