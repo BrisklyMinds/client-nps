@@ -41,26 +41,55 @@ openssl rand -base64 32
 - `.env.backend`: `SECRET_KEY`, `DATABASE_PASSWORD`, `TELEGRAM_BOT_TOKEN`, `TELEGRAM_CHAT_ID`
 - `.env.frontend`: `NEXTAUTH_SECRET`
 
-## 4. Get SSL certificate (Let's Encrypt)
+## 4. Configure host nginx (SSL termination)
 
-Install certbot and obtain certificate for `feedback.trade.kg`:
+The Docker stack runs an internal nginx on `127.0.0.1:8080` (HTTP only).
+The host nginx handles SSL termination via certbot and proxies to it.
+
+Install certbot and obtain certificate:
 ```bash
-sudo apt install certbot
-sudo certbot certonly --standalone -d feedback.trade.kg
+sudo apt install nginx certbot python3-certbot-nginx
+sudo certbot --nginx -d feedback.trade.kg
 ```
 
-Copy certificates to nginx folder:
-```bash
-mkdir -p nginx/certs
-sudo cp /etc/letsencrypt/live/feedback.trade.kg/fullchain.pem nginx/certs/
-sudo cp /etc/letsencrypt/live/feedback.trade.kg/privkey.pem nginx/certs/
-sudo chown -R $USER:$USER nginx/certs
+Add to `/etc/nginx/sites-available/feedback.trade.kg`:
+```nginx
+server {
+    listen 443 ssl http2;
+    server_name feedback.trade.kg;
+
+    ssl_certificate /etc/letsencrypt/live/feedback.trade.kg/fullchain.pem;
+    ssl_certificate_key /etc/letsencrypt/live/feedback.trade.kg/privkey.pem;
+
+    client_max_body_size 10M;
+
+    location / {
+        proxy_pass http://127.0.0.1:8080;
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto https;
+        proxy_set_header X-Forwarded-Host $host;
+        proxy_set_header Upgrade $http_upgrade;
+        proxy_set_header Connection "upgrade";
+        proxy_buffering off;
+    }
+}
+
+server {
+    listen 80;
+    server_name feedback.trade.kg;
+    return 301 https://$host$request_uri;
+}
 ```
 
-**Auto-renewal** (add to crontab):
+Enable and reload:
 ```bash
-0 3 * * * certbot renew --quiet --post-hook "cp /etc/letsencrypt/live/feedback.trade.kg/*.pem /path/to/client-nps/nginx/certs/ && cd /path/to/client-nps && docker compose -f docker-compose.prod.yaml restart nginx"
+sudo ln -s /etc/nginx/sites-available/feedback.trade.kg /etc/nginx/sites-enabled/
+sudo nginx -t && sudo systemctl reload nginx
 ```
+
+Certbot auto-renewal is already set up by `certbot --nginx`.
 
 ## 5. Start production stack
 
