@@ -14,9 +14,16 @@ SECRET_KEY = environ.get("SECRET_KEY", get_random_secret_key())
 
 DEBUG = environ.get("DEBUG", "") == "1"
 
-ALLOWED_HOSTS = ["*"]
+ALLOWED_HOSTS = environ.get(
+    "ALLOWED_HOSTS", "localhost,127.0.0.1,api,feedback.trade.kg"
+).split(",")
 
 FRONTEND_URL = environ.get("FRONTEND_URL", "http://localhost:3000")
+
+CSRF_TRUSTED_ORIGINS = environ.get(
+    "CSRF_TRUSTED_ORIGINS",
+    "http://localhost:3000,http://localhost:8080,https://feedback.trade.kg",
+).split(",")
 
 WSGI_APPLICATION = "api.wsgi.application"
 

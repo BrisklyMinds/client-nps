@@ -313,7 +313,6 @@ export function FileUpload({
           onDragOver={handleZoneDragOver}
           onDragLeave={handleZoneDragLeave}
           onClick={() => inputRef.current?.click()}
-          // biome-ignore lint/a11y/useSemanticElements: drop zone needs custom div with button role
           role="button"
           tabIndex={0}
           onKeyDown={(e) => {
