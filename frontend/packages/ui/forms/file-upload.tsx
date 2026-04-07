@@ -129,6 +129,7 @@ export function FileUpload({
     [files, onFilesChange]
   )
 
+  // biome-ignore lint/correctness/useExhaustiveDependencies: re-run when files array changes
   useEffect(() => {
     let changed = false
     for (const entry of entriesRef.current) {
