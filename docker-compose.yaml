@@ -32,7 +32,7 @@ services:
       db:
         condition: service_healthy
   web:
-    command: bash -c "pnpm install -r && pnpm --filter web build && pnpm --filter web start"
+    command: bash -c "pnpm install -r && pnpm --filter web build && cp -r apps/web/public apps/web/.next/standalone/apps/web/ && cp -r apps/web/.next/static apps/web/.next/standalone/apps/web/.next/ && node apps/web/.next/standalone/apps/web/server.js"
     build:
       context: frontend
     volumes:
