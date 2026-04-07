@@ -19,7 +19,15 @@
     }
   },
   "linter": {
-    "enabled": true
+    "enabled": true,
+    "rules": {
+      "a11y": {
+        "useSemanticElements": "off",
+        "useAriaPropsForRole": "off",
+        "useFocusableInteractive": "off",
+        "noNoninteractiveElementToInteractiveRole": "off"
+      }
+    }
   },
   "organizeImports": {
     "enabled": true

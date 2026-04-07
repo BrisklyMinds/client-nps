@@ -129,6 +129,7 @@ export function FileUpload({
     [files, onFilesChange]
   )
 
+  // biome-ignore lint/correctness/useExhaustiveDependencies: re-run when files array changes
   useEffect(() => {
     let changed = false
     for (const entry of entriesRef.current) {
@@ -312,6 +313,7 @@ export function FileUpload({
           onDragOver={handleZoneDragOver}
           onDragLeave={handleZoneDragLeave}
           onClick={() => inputRef.current?.click()}
+          // biome-ignore lint/a11y/useSemanticElements: drop zone needs custom div with button role
           role="button"
           tabIndex={0}
           onKeyDown={(e) => {
