@@ -23,8 +23,6 @@ interface ProcessedItem {
   status: string
   comment: string
   created_at: string
-  last_operator: string | null
-  resolved_at: string | null
 }
 
 async function fetchCount(

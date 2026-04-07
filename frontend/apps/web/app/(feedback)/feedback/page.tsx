@@ -1,55 +1,11 @@
-import { FeedbackForm } from '@/components/forms/feedback-form'
-import type { Metadata } from 'next'
+import { redirect } from 'next/navigation'
 
-export const metadata: Metadata = {
-  title: 'Оставить отзыв - КСВ'
-}
-
-interface SystemOption {
-  name: string
-  slug: string
-}
-
-export default async function FeedbackPage({
+export default async function FeedbackRedirectPage({
   searchParams
 }: {
   searchParams: Promise<{ system?: string }>
 }) {
-  const { system: preselectedSlug } = await searchParams
-
-  let systems: SystemOption[] = []
-  try {
-    const res = await fetch(`${process.env.API_URL}/api/systems/active/`, {
-      cache: 'no-store'
-    })
-    if (res.ok) {
-      const data = await res.json()
-      systems = (data.results ?? data ?? []).map(
-        (s: { name: string; slug: string }) => ({
-          name: s.name,
-          slug: s.slug
-        })
-      )
-    }
-  } catch {
-    // fallback empty
-  }
-
-  if (systems.length === 0) {
-    return (
-      <div className="rounded-lg bg-card p-6 text-center shadow-sm">
-        <h1 className="mb-2 text-xl font-bold">Нет доступных систем</h1>
-        <p className="text-muted-foreground">
-          Обратитесь к администратору для создания системы.
-        </p>
-      </div>
-    )
-  }
-
-  return (
-    <FeedbackForm
-      systems={systems}
-      preselectedSlug={preselectedSlug}
-    />
-  )
+  const { system } = await searchParams
+  const target = system ? `/?system=${system}` : '/'
+  redirect(target)
 }

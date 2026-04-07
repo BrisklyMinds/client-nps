@@ -133,7 +133,7 @@ class FeedbackViewSet(
         Feedback.objects.select_related("system").prefetch_related("files").all()
     )
     permission_classes = [IsAuthenticated]
-    filterset_fields = ["system__slug", "feedback_type", "rating"]
+    filterset_fields = ["system__slug", "feedback_type", "rating", "status"]
 
     def get_permissions(self):
         if self.action in ("create", "track", "incidents"):

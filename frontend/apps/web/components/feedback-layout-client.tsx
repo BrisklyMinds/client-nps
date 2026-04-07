@@ -25,7 +25,7 @@ function Header({ lang, setLang }: { lang: Lang; setLang: (l: Lang) => void }) {
   return (
     <div className="mb-5 flex w-full max-w-[480px] flex-col gap-2 lg:max-w-[540px] sm:mb-8">
       <div className="flex items-center justify-between">
-        <Link href="/feedback" className="cursor-pointer">
+        <Link href="/" className="cursor-pointer">
           <Image
             src={LOGO[lang]}
             alt="KSW"
