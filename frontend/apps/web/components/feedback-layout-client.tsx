@@ -91,9 +91,9 @@ export function FeedbackLayoutClient({
         <main
           className="flex flex-1 justify-center px-4 py-8 sm:px-6 sm:py-12"
           style={{
-            backgroundImage: 'url(/pattern-tile.png)',
+            backgroundImage: 'url(/pattern-03.svg)',
             backgroundRepeat: 'repeat',
-            backgroundSize: '80px 80px',
+            backgroundSize: '320px 320px',
             backgroundColor: 'hsl(var(--background))',
           }}
         >
