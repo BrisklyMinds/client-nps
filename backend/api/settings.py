@@ -14,7 +14,7 @@ SECRET_KEY = environ.get("SECRET_KEY", get_random_secret_key())
 
 DEBUG = environ.get("DEBUG", "") == "1"
 
-ALLOWED_HOSTS = ["localhost", "api"]
+ALLOWED_HOSTS = ["*"]
 
 FRONTEND_URL = environ.get("FRONTEND_URL", "http://localhost:3000")
 
@@ -141,10 +141,14 @@ FILE_UPLOAD_MAX_MEMORY_SIZE = 5 * 1024 * 1024  # 5 MB
 ######################################################################
 # CORS
 ######################################################################
-CORS_ALLOWED_ORIGINS = [
-    FRONTEND_URL,
-]
+CORS_ALLOW_ALL_ORIGINS = True
 CORS_ALLOW_CREDENTIALS = True
+
+######################################################################
+# Telegram Bot
+######################################################################
+TELEGRAM_BOT_TOKEN = environ.get("TELEGRAM_BOT_TOKEN", "")
+TELEGRAM_CHAT_ID = environ.get("TELEGRAM_CHAT_ID", "")
 
 ######################################################################
 # Rest Framework

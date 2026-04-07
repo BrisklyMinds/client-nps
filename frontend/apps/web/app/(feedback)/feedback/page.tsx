@@ -5,37 +5,51 @@ export const metadata: Metadata = {
   title: 'Оставить отзыв - КСВ'
 }
 
+interface SystemOption {
+  name: string
+  slug: string
+}
+
 export default async function FeedbackPage({
   searchParams
 }: {
   searchParams: Promise<{ system?: string }>
 }) {
-  const { system } = await searchParams
+  const { system: preselectedSlug } = await searchParams
 
-  if (!system) {
+  let systems: SystemOption[] = []
+  try {
+    const res = await fetch(`${process.env.API_URL}/api/systems/active/`, {
+      cache: 'no-store'
+    })
+    if (res.ok) {
+      const data = await res.json()
+      systems = (data.results ?? data ?? []).map(
+        (s: { name: string; slug: string }) => ({
+          name: s.name,
+          slug: s.slug
+        })
+      )
+    }
+  } catch {
+    // fallback empty
+  }
+
+  if (systems.length === 0) {
     return (
       <div className="rounded-lg bg-card p-6 text-center shadow-sm">
-        <h1 className="mb-2 text-xl font-bold">Система не указана</h1>
+        <h1 className="mb-2 text-xl font-bold">Нет доступных систем</h1>
         <p className="text-muted-foreground">
-          Пожалуйста, отсканируйте QR-код для перехода к форме обратной связи.
+          Обратитесь к администратору для создания системы.
         </p>
       </div>
     )
   }
 
-  let systemName = system
-  try {
-    const res = await fetch(
-      `${process.env.API_URL}/api/systems/${system}/public/`,
-      { cache: 'no-store' }
-    )
-    if (res.ok) {
-      const data = await res.json()
-      systemName = data.name
-    }
-  } catch {
-    // Use slug as fallback name
-  }
-
-  return <FeedbackForm systemSlug={system} systemName={systemName} />
+  return (
+    <FeedbackForm
+      systems={systems}
+      preselectedSlug={preselectedSlug}
+    />
+  )
 }

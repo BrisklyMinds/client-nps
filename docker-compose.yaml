@@ -45,6 +45,28 @@ services:
       - .env.frontend
     depends_on:
       - api
+  bot:
+    command: bash -c "uv sync && uv run -- python manage.py runbot"
+    build:
+      context: backend
+    volumes:
+      - ./backend:/app
+    env_file:
+      - .env.backend
+    depends_on:
+      db:
+        condition: service_healthy
+      api:
+        condition: service_started
+  nginx:
+    image: nginx:alpine
+    ports:
+      - "8080:80"
+    volumes:
+      - ./nginx/nginx.conf:/etc/nginx/conf.d/default.conf:ro
+    depends_on:
+      - api
+      - web
 
 volumes:
   media_data:

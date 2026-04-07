@@ -15,13 +15,16 @@ from rest_framework.decorators import action
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.response import Response
 
-from .models import Feedback, System
+from .models import Feedback, FeedbackStatusLog, System
 from .serializers import (
     FeedbackCreateErrorSerializer,
     FeedbackCreateSerializer,
     FeedbackDetailSerializer,
     FeedbackListSerializer,
+    FeedbackPublicIncidentSerializer,
     FeedbackStatsSerializer,
+    FeedbackTrackSerializer,
+    FeedbackUpdateStatusSerializer,
     SystemListSerializer,
     SystemPublicSerializer,
     SystemSerializer,
@@ -133,7 +136,7 @@ class FeedbackViewSet(
     filterset_fields = ["system__slug", "feedback_type", "rating"]
 
     def get_permissions(self):
-        if self.action == "create":
+        if self.action in ("create", "track", "incidents"):
             return [AllowAny()]
         return super().get_permissions()
 
@@ -142,6 +145,12 @@ class FeedbackViewSet(
             return FeedbackCreateSerializer
         if self.action == "list":
             return FeedbackListSerializer
+        if self.action == "track":
+            return FeedbackTrackSerializer
+        if self.action == "update_status":
+            return FeedbackUpdateStatusSerializer
+        if self.action == "incidents":
+            return FeedbackPublicIncidentSerializer
         return FeedbackDetailSerializer
 
     @extend_schema(
@@ -199,6 +208,61 @@ class FeedbackViewSet(
             )
         return response
 
+    @extend_schema(responses={200: FeedbackTrackSerializer})
+    @action(
+        detail=False,
+        methods=["get"],
+        url_path="track/(?P<tracking_id>[^/.]+)",
+        permission_classes=[AllowAny],
+    )
+    def track(self, request, tracking_id=None):
+        try:
+            feedback = Feedback.objects.select_related("system").prefetch_related(
+                "status_logs__operator"
+            ).get(tracking_id=tracking_id)
+        except Feedback.DoesNotExist:
+            return Response(
+                {"detail": "Заявка не найдена"}, status=status.HTTP_404_NOT_FOUND
+            )
+        return Response(FeedbackTrackSerializer(feedback).data)
+
+    @action(detail=True, methods=["post"], url_path="update-status")
+    def update_status(self, request, pk=None):
+        feedback = self.get_object()
+        serializer = FeedbackUpdateStatusSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+
+        new_status = serializer.validated_data["status"]
+        comment = serializer.validated_data.get("comment", "")
+
+        feedback.status = new_status
+        feedback.save(update_fields=["status"])
+
+        FeedbackStatusLog.objects.create(
+            feedback=feedback,
+            status=new_status,
+            comment=comment,
+            operator=request.user,
+        )
+
+        return Response(FeedbackDetailSerializer(feedback).data)
+
+    @extend_schema(responses={200: FeedbackPublicIncidentSerializer(many=True)})
+    @action(
+        detail=False,
+        methods=["get"],
+        url_path="incidents",
+        permission_classes=[AllowAny],
+    )
+    def incidents(self, request):
+        qs = (
+            Feedback.objects.filter(is_public=True)
+            .select_related("system")
+            .prefetch_related("status_logs__operator")
+            .order_by("-created_at")[:50]
+        )
+        return Response(FeedbackPublicIncidentSerializer(qs, many=True).data)
+
 
 class SystemViewSet(viewsets.ModelViewSet):
     queryset = System.objects.all()
@@ -207,7 +271,7 @@ class SystemViewSet(viewsets.ModelViewSet):
     lookup_field = "slug"
 
     def get_permissions(self):
-        if self.action == "public":
+        if self.action in ("public", "active_list"):
             return [AllowAny()]
         return super().get_permissions()
 
@@ -223,9 +287,21 @@ class SystemViewSet(viewsets.ModelViewSet):
     def get_serializer_class(self):
         if self.action == "list":
             return SystemListSerializer
-        if self.action == "public":
+        if self.action in ("public", "active_list"):
             return SystemPublicSerializer
         return SystemSerializer
+
+    @extend_schema(responses={200: SystemPublicSerializer(many=True)})
+    @action(
+        detail=False,
+        methods=["get"],
+        url_path="active",
+        permission_classes=[AllowAny],
+    )
+    def active_list(self, request):
+        qs = System.objects.filter(is_active=True).order_by("name")
+        serializer = SystemPublicSerializer(qs, many=True)
+        return Response(serializer.data)
 
     @extend_schema(responses={200: SystemPublicSerializer})
     @action(

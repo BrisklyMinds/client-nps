@@ -1,3 +1,5 @@
+import uuid
+
 from django.contrib.auth.models import AbstractUser
 from django.core.validators import MaxValueValidator, MinValueValidator
 from django.db import models
@@ -39,17 +41,28 @@ class FeedbackType(models.TextChoices):
     BUG = "bug", _("System Problem")
     REVIEW = "review", _("Review")
     SUGGESTION = "suggestion", _("Suggestion")
+    CORRUPTION = "corruption", _("Corruption Report")
     OTHER = "other", _("Other")
 
 
+class FeedbackStatus(models.TextChoices):
+    NEW = "new", _("New")
+    IN_PROGRESS = "in_progress", _("In Progress")
+    RESOLVED = "resolved", _("Resolved")
+    REJECTED = "rejected", _("Rejected")
+
+
 class Feedback(models.Model):
+    tracking_id = models.UUIDField(
+        _("tracking ID"), default=uuid.uuid4, unique=True, editable=False
+    )
     system = models.ForeignKey(
         System,
         on_delete=models.CASCADE,
         related_name="feedbacks",
         verbose_name=_("system"),
     )
-    phone = models.CharField(_("phone number"), max_length=20)
+    phone = models.CharField(_("phone number"), max_length=20, blank=True, default="")
     feedback_type = models.CharField(
         _("feedback type"),
         max_length=20,
@@ -62,6 +75,17 @@ class Feedback(models.Model):
         validators=[MinValueValidator(1), MaxValueValidator(5)],
     )
     comment = models.TextField(_("comment"))
+    status = models.CharField(
+        _("status"),
+        max_length=20,
+        choices=FeedbackStatus.choices,
+        default=FeedbackStatus.NEW,
+    )
+    is_public = models.BooleanField(
+        _("show on status page"),
+        default=False,
+        help_text=_("If checked, this feedback will appear on the public status page"),
+    )
     created_at = models.DateTimeField(_("created at"), auto_now_add=True)
 
     class Meta:
@@ -71,7 +95,41 @@ class Feedback(models.Model):
         ordering = ["-created_at"]
 
     def __str__(self):
-        return f"{self.system.name} - {self.get_feedback_type_display()} - {self.created_at}"
+        return f"{self.tracking_id} - {self.system.name} - {self.get_status_display()}"
+
+    @property
+    def short_id(self):
+        return str(self.tracking_id)[:8].upper()
+
+
+class FeedbackStatusLog(models.Model):
+    feedback = models.ForeignKey(
+        Feedback,
+        on_delete=models.CASCADE,
+        related_name="status_logs",
+        verbose_name=_("feedback"),
+    )
+    status = models.CharField(
+        _("status"), max_length=20, choices=FeedbackStatus.choices
+    )
+    comment = models.TextField(_("operator comment"), blank=True, default="")
+    operator = models.ForeignKey(
+        "User",
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        verbose_name=_("operator"),
+    )
+    created_at = models.DateTimeField(_("created at"), auto_now_add=True)
+
+    class Meta:
+        db_table = "feedback_status_logs"
+        verbose_name = _("status log")
+        verbose_name_plural = _("status logs")
+        ordering = ["-created_at"]
+
+    def __str__(self):
+        return f"{self.feedback.short_id} → {self.get_status_display()}"
 
 
 def feedback_file_upload_path(instance, filename):
