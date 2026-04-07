@@ -2,9 +2,11 @@
 
 import { useState } from 'react'
 import Image from 'next/image'
+import Link from 'next/link'
 import { twMerge } from 'tailwind-merge'
 import type { Lang } from '@/lib/i18n'
 import { LangProvider } from '@/lib/lang-context'
+import { useT } from '@/lib/lang-context'
 
 const LANGS: { code: Lang; label: string }[] = [
   { code: 'ky', label: 'KY' },
@@ -18,17 +20,12 @@ const LOGO: Record<Lang, string> = {
   en: '/logo-en.svg'
 }
 
-export function FeedbackLayoutClient({
-  children
-}: {
-  children: React.ReactNode
-}) {
-  const [lang, setLang] = useState<Lang>('ru')
-
+function Header({ lang, setLang }: { lang: Lang; setLang: (l: Lang) => void }) {
+  const t = useT()
   return (
-    <LangProvider value={lang}>
-      <div className="flex min-h-dvh flex-col items-center bg-background px-4 py-6 sm:px-6 sm:py-10 lg:py-14">
-        <div className="mb-5 flex w-full max-w-[480px] items-center justify-between lg:max-w-[540px] sm:mb-8">
+    <div className="mb-5 flex w-full max-w-[480px] flex-col gap-2 lg:max-w-[540px] sm:mb-8">
+      <div className="flex items-center justify-between">
+        <Link href="/feedback" className="cursor-pointer">
           <Image
             src={LOGO[lang]}
             alt="KSW"
@@ -37,7 +34,15 @@ export function FeedbackLayoutClient({
             className="h-8 w-auto sm:h-10"
             priority
           />
+        </Link>
 
+        <div className="flex items-center gap-3">
+          <Link
+            href="/status"
+            className="text-xs font-medium text-muted-foreground hover:text-primary transition-colors"
+          >
+            {t('status.link')}
+          </Link>
           <div className="flex gap-1 rounded-lg bg-card p-1 shadow-sm">
             {LANGS.map((l) => (
               <button
@@ -56,7 +61,22 @@ export function FeedbackLayoutClient({
             ))}
           </div>
         </div>
+      </div>
+    </div>
+  )
+}
 
+export function FeedbackLayoutClient({
+  children
+}: {
+  children: React.ReactNode
+}) {
+  const [lang, setLang] = useState<Lang>('ru')
+
+  return (
+    <LangProvider value={lang}>
+      <div className="flex min-h-dvh flex-col items-center bg-background px-4 py-6 sm:px-6 sm:py-10 lg:py-14">
+        <Header lang={lang} setLang={setLang} />
         <div className="w-full max-w-[480px] lg:max-w-[540px]">{children}</div>
       </div>
     </LangProvider>

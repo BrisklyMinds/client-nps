@@ -182,6 +182,11 @@ class FeedbackViewSet(
                 .annotate(count=Count("id"))
                 .order_by("-count")
             ),
+            "by_status": dict(
+                qs.values_list("status")
+                .annotate(count=Count("id"))
+                .order_by()
+            ),
         }
         return Response(FeedbackStatsSerializer(stats_data).data)
 

@@ -41,19 +41,43 @@ openssl rand -base64 32
 - `.env.backend`: `SECRET_KEY`, `DATABASE_PASSWORD`, `TELEGRAM_BOT_TOKEN`, `TELEGRAM_CHAT_ID`
 - `.env.frontend`: `NEXTAUTH_SECRET`
 
-## 4. Configure host nginx (SSL termination)
+## 4. Architecture: SSL proxy on a separate server
 
-The Docker stack runs an internal nginx on `127.0.0.1:8080` (HTTP only).
-The host nginx handles SSL termination via certbot and proxies to it.
-
-Install certbot and obtain certificate:
-```bash
-sudo apt install nginx certbot python3-certbot-nginx
-sudo certbot --nginx -d feedback.trade.kg
+```
+Internet → SSL Proxy Server (nginx + certbot) → APP Server (docker stack)
+            feedback.trade.kg                    APP_SERVER_IP:8080
 ```
 
-Add to `/etc/nginx/sites-available/feedback.trade.kg`:
+The Docker stack runs nginx on port `8080` exposed externally.
+A **separate server** runs nginx with SSL/certbot and proxies traffic to the app server.
+
+### 4a. App server firewall (where docker compose runs)
+
+Allow port 8080 **only** from the SSL proxy server's IP:
+```bash
+sudo ufw allow from <SSL_PROXY_IP> to any port 8080
+sudo ufw deny 8080
+```
+
+### 4b. SSL proxy server setup
+
+Install nginx + certbot:
+```bash
+sudo apt install nginx certbot python3-certbot-nginx
+```
+
+Create `/etc/nginx/sites-available/feedback.trade.kg`:
 ```nginx
+upstream app_backend {
+    server <APP_SERVER_IP>:8080;
+}
+
+server {
+    listen 80;
+    server_name feedback.trade.kg;
+    return 301 https://$host$request_uri;
+}
+
 server {
     listen 443 ssl http2;
     server_name feedback.trade.kg;
@@ -64,7 +88,7 @@ server {
     client_max_body_size 10M;
 
     location / {
-        proxy_pass http://127.0.0.1:8080;
+        proxy_pass http://app_backend;
         proxy_set_header Host $host;
         proxy_set_header X-Real-IP $remote_addr;
         proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
@@ -73,25 +97,21 @@ server {
         proxy_set_header Upgrade $http_upgrade;
         proxy_set_header Connection "upgrade";
         proxy_buffering off;
+        proxy_read_timeout 60s;
     }
-}
-
-server {
-    listen 80;
-    server_name feedback.trade.kg;
-    return 301 https://$host$request_uri;
 }
 ```
 
-Enable and reload:
+Enable site and obtain SSL:
 ```bash
 sudo ln -s /etc/nginx/sites-available/feedback.trade.kg /etc/nginx/sites-enabled/
 sudo nginx -t && sudo systemctl reload nginx
+sudo certbot --nginx -d feedback.trade.kg
 ```
 
-Certbot auto-renewal is already set up by `certbot --nginx`.
+Certbot auto-renewal is set up automatically.
 
-## 5. Start production stack
+## 5. Start production stack (on app server)
 
 ```bash
 docker compose -f docker-compose.prod.yaml up -d --build

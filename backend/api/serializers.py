@@ -293,6 +293,7 @@ class FeedbackStatsSerializer(serializers.Serializer):
     average_rating = serializers.FloatField(allow_null=True)
     by_type = serializers.DictField(child=serializers.IntegerField())
     by_system = serializers.ListField(child=serializers.DictField())
+    by_status = serializers.DictField(child=serializers.IntegerField())
 
 
 class FeedbackUpdateStatusSerializer(serializers.Serializer):
