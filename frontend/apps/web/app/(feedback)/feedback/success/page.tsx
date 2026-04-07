@@ -27,7 +27,7 @@ function SuccessContent() {
   }
 
   return (
-    <div className="rounded-lg bg-card p-8 text-center shadow-sm">
+    <div className="rounded-xl bg-white p-6 text-center shadow-md sm:p-8">
       <style
         // biome-ignore lint/security/noDangerouslySetInnerHtml: CSS animations
         dangerouslySetInnerHTML={{

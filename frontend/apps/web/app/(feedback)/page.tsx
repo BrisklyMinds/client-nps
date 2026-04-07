@@ -37,7 +37,7 @@ export default async function HomePage({
 
   if (systems.length === 0) {
     return (
-      <div className="rounded-lg bg-card p-6 text-center shadow-sm">
+      <div className="rounded-xl bg-white p-8 text-center shadow-md">
         <h1 className="mb-2 text-xl font-bold">Нет доступных систем</h1>
         <p className="text-muted-foreground">
           Обратитесь к администратору для создания системы.

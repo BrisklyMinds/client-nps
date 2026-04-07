@@ -82,7 +82,7 @@ export default async function StatusPage() {
 
   return (
     <div className="mx-auto w-full max-w-2xl">
-      <div className="mb-8 rounded-lg bg-card p-6 shadow-sm">
+      <div className="mb-8 rounded-xl bg-white p-6 shadow-md">
         <div className="flex items-center gap-3">
           <div
             className={`h-4 w-4 rounded-full ${
@@ -115,7 +115,7 @@ export default async function StatusPage() {
               {items.map((inc) => (
                 <div
                   key={inc.short_id}
-                  className="rounded-lg border border-gray-200 bg-card p-4"
+                  className="rounded-xl border border-border bg-white p-4"
                 >
                   <div className="mb-2 flex items-start justify-between">
                     <div>

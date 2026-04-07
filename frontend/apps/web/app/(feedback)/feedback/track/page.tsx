@@ -106,7 +106,7 @@ function TrackContent() {
 
   if (loading) {
     return (
-      <div className="rounded-lg bg-card p-6 text-center shadow-sm">
+      <div className="rounded-xl bg-white p-6 text-center shadow-md">
         <p className="text-muted-foreground">{t('track.loading')}</p>
       </div>
     )
@@ -114,7 +114,7 @@ function TrackContent() {
 
   if (!id || notFound || !data) {
     return (
-      <div className="rounded-lg bg-card p-6 text-center shadow-sm">
+      <div className="rounded-xl bg-white p-6 text-center shadow-md">
         <h1 className="mb-2 text-xl font-bold">{t('track.notFound.title')}</h1>
         <p className="text-muted-foreground">{t('track.notFound.desc')}</p>
       </div>
@@ -125,7 +125,7 @@ function TrackContent() {
 
   return (
     <div className="space-y-4">
-      <div className="rounded-lg bg-card p-6 shadow-sm">
+      <div className="rounded-xl bg-white p-6 shadow-md">
         <div className="mb-4 flex items-start justify-between">
           <div>
             <p className="text-xs text-muted-foreground">{t('track.id')}</p>
@@ -158,7 +158,7 @@ function TrackContent() {
         </div>
       </div>
 
-      <div className="rounded-lg bg-card p-6 shadow-sm">
+      <div className="rounded-xl bg-white p-6 shadow-md">
         <h2 className="mb-4 text-lg font-semibold">{t('track.history')}</h2>
 
         {data.status_logs.length === 0 ? (

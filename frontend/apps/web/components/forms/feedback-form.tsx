@@ -175,7 +175,7 @@ export function FeedbackForm({
         </div>
       )}
 
-      <div className="rounded-lg bg-card p-6 shadow-sm">
+      <div className="rounded-xl bg-white p-5 shadow-md sm:p-8">
         <div className="mb-6">
           <h1 className="text-xl font-bold">{t('feedback.title')}</h1>
           {selectedSystem && (
