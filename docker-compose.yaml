@@ -32,7 +32,7 @@ services:
       db:
         condition: service_healthy
   web:
-    command: bash -c "pnpm install -r && pnpm --filter web dev"
+    command: bash -c "pnpm install -r && pnpm --filter web build && pnpm --filter web start"
     build:
       context: frontend
     volumes:

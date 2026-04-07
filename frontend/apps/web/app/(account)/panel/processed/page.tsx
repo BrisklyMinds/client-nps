@@ -110,7 +110,7 @@ export default async function ProcessedPage({
       </div>
 
       {/* Stats bar */}
-      <div className="mb-6 grid grid-cols-3 gap-4">
+      <div className="mb-6 grid grid-cols-1 gap-4 sm:grid-cols-3">
         <div className="rounded-xl bg-green-50 p-4 shadow-sm">
           <p className="text-sm font-medium text-green-600">Решено всего</p>
           <p className="mt-1 text-2xl font-bold text-green-700">
@@ -157,7 +157,7 @@ export default async function ProcessedPage({
 
       <div className="overflow-hidden rounded-xl bg-card shadow-sm">
         <div className="overflow-x-auto">
-          <table className="w-full text-sm">
+          <table className="w-full min-w-[560px] text-sm">
             <thead>
               <tr className="border-b bg-muted/30 text-left text-muted-foreground">
                 <th className="px-4 py-3 font-medium">ID</th>

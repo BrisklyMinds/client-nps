@@ -24,40 +24,40 @@ export default async function AdminLayout({
   return (
     <div className="min-h-dvh bg-background">
       <nav className="sticky top-0 z-10 border-b bg-card shadow-sm">
-        <div className="mx-auto flex max-w-6xl items-center gap-6 px-4 py-0">
+        <div className="mx-auto flex max-w-6xl items-center gap-2 px-3 sm:gap-4 sm:px-4">
           <Link
             href="/panel/dashboard"
-            className="shrink-0 py-3 text-base font-bold text-primary"
+            className="shrink-0 py-3 text-sm font-bold text-primary sm:text-base"
           >
             NPS
           </Link>
 
-          <div className="flex flex-1 items-center gap-1 overflow-x-auto">
+          <div className="flex min-w-0 flex-1 items-center overflow-x-auto">
             {NAV_LINKS.map((link) => (
               <Link
                 key={link.href}
                 href={link.href}
-                className="shrink-0 rounded-md px-3 py-2 text-sm font-medium text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
+                className="shrink-0 rounded-md px-2.5 py-2 text-xs font-medium text-muted-foreground transition-colors hover:bg-muted hover:text-foreground sm:px-3 sm:text-sm"
               >
                 {link.label}
               </Link>
             ))}
           </div>
 
-          <div className="flex shrink-0 items-center gap-3">
-            <span className="hidden text-sm text-muted-foreground sm:block">
+          <div className="flex shrink-0 items-center gap-2">
+            <span className="hidden text-xs text-muted-foreground lg:block">
               {session.user?.username}
             </span>
             <Link
               href="/api/auth/signout"
-              className="rounded-md bg-muted px-3 py-1.5 text-xs font-medium text-muted-foreground transition-colors hover:bg-muted/70 hover:text-foreground"
+              className="rounded-md bg-muted px-2.5 py-1.5 text-xs font-medium text-muted-foreground transition-colors hover:bg-muted/70 hover:text-foreground"
             >
               Выйти
             </Link>
           </div>
         </div>
       </nav>
-      <main className="mx-auto max-w-6xl px-4 py-6">{children}</main>
+      <main className="mx-auto max-w-6xl px-3 py-4 sm:px-4 sm:py-6">{children}</main>
     </div>
   )
 }

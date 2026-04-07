@@ -74,7 +74,7 @@ export default async function DashboardPage() {
       <h1 className="mb-6 text-2xl font-bold">Дашборд</h1>
 
       {/* Summary cards */}
-      <div className="mb-8 grid gap-4 sm:grid-cols-3">
+      <div className="mb-8 grid grid-cols-1 gap-4 sm:grid-cols-3">
         <div className="rounded-xl bg-card p-5 shadow-sm">
           <p className="text-sm text-muted-foreground">Всего заявок</p>
           <p className="mt-1 text-3xl font-bold">{stats.total_count}</p>
@@ -119,7 +119,7 @@ export default async function DashboardPage() {
       {/* By type */}
       <div className="mb-8">
         <h2 className="mb-4 text-lg font-semibold">По типам</h2>
-        <div className="grid gap-3 sm:grid-cols-5">
+        <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-5">
           {Object.entries(stats.by_type).map(([type, count]) => (
             <div
               key={type}
